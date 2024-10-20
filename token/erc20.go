@@ -1,14 +1,12 @@
 package token
 
 import (
-  "embed"
-
-  "github.com/ethereum/go-ethereum/ethclient"
-  "github.com/sarems/blockchain-tools/ethereum"
+	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/sarems/blockchain-tools/ethereum"
 )
 
 //go:embed abi/erc20.abi.json
-var ERC20ABI string
+var erc20Abi string
 
 type ERC20Token struct {
 	name     string
@@ -24,20 +22,20 @@ func NewERC20Token(name string, address string, decimals uint) *ERC20Token {
 	}
 }
 
-func NewERC20FromAddressString(client *ethclient.Client, address string) (*ERC20Token, error) {}
-  var name *string = new(string)
-  err := ethereum.GetChainData(client, address, ERC20ABI, "name", name)
-  if err != nil {
-    return nil, err
-  }
+func NewERC20FromAddressString(client *ethclient.Client, address string) (*ERC20Token, error) {
+	name := new(string)
+	err := ethereum.GetChainData(client, address, erc20Abi, "name", name)
+	if err != nil {
+		return nil, err
+	}
 
-  var decimals *uint = new(uint)
-  err = ethereum.GetChainData(client, address, erc20ABI, "decimals", decimals)
-  if err != nil {
-    return nil, err
-  }
-  
-  return NewERC20Token(*name, address, *decimals), nil
+	decimals := new(uint)
+	err = ethereum.GetChainData(client, address, erc20Abi, "decimals", decimals)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewERC20Token(*name, address, *decimals), nil
 }
 
 func (e *ERC20Token) GetTokenName() string {
