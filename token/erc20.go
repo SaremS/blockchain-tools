@@ -1,6 +1,8 @@
 package token
 
 import (
+	_ "embed"
+
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/sarems/blockchain-tools/ethereum"
 )
@@ -11,10 +13,10 @@ var erc20Abi string
 type ERC20Token struct {
 	name     string
 	address  string
-	decimals uint
+	decimals uint8
 }
 
-func NewERC20Token(name string, address string, decimals uint) *ERC20Token {
+func NewERC20Token(name string, address string, decimals uint8) *ERC20Token {
 	return &ERC20Token{
 		name:     name,
 		address:  address,
@@ -29,7 +31,7 @@ func NewERC20FromAddressString(client *ethclient.Client, address string) (*ERC20
 		return nil, err
 	}
 
-	decimals := new(uint)
+	decimals := new(uint8)
 	err = ethereum.GetChainData(client, address, erc20Abi, "decimals", decimals)
 	if err != nil {
 		return nil, err
@@ -46,6 +48,6 @@ func (e *ERC20Token) GetAddressAsString() string {
 	return e.address
 }
 
-func (e *ERC20Token) GetDecimals() uint {
+func (e *ERC20Token) GetDecimals() uint8 {
 	return e.decimals
 }

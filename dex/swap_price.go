@@ -1,9 +1,11 @@
 package dex
 
 import (
+	_ "embed"
 	"log"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/sarems/blockchain-tools/ethereum"
@@ -14,13 +16,13 @@ import (
 var uniswapV3PoolAbi string
 
 type TokenPair struct {
-	token0 *token.Token
-	token1 *token.Token
+	token0 *token.ERC20Token
+	token1 *token.ERC20Token
 }
 
 type TokenPairAndPrice struct {
-	tokenPair TokenPair
-	price     *big.Int
+	tokenPair    TokenPair
+	sqrtPriceX96 *big.Int
 }
 
 type SwapPrices struct {
@@ -29,33 +31,43 @@ type SwapPrices struct {
 	priceByPoolAddress map[string]*big.Int
 }
 
-func NewSwapPrice(rpcAddress string, poolAddresses []string) *SwapPrices {
+type slot0Data struct {
+	SqrtPriceX96               *big.Int
+	Tick                       *big.Int
+	ObservationIndex           uint16
+	ObservationCardinality     uint16
+	ObservationCardinalityNext uint16
+	FeeProtocol                uint8
+	Unlocked                   bool
 }
 
-func (s *SwapPrices) queryTokensAndPrice(rpcAddress string, poolAddress string, tokenPairAndPrice chan<- TokenPairAndPrice) {
+//func NewSwapPrice(rpcAddress string, poolAddresses []string) *SwapPrices {
+//}
+
+func queryTokensAndPrice(rpcAddress string, poolAddress string, tokenPairAndPriceChannel chan<- TokenPairAndPrice) {
 	client, err := ethclient.Dial(rpcAddress)
 	if err != nil {
 		log.Fatalf("Failed to connect to the Ethereum client: %v", err)
 	}
 
-	var token0Address *string = new(string)
+	token0Address := new(common.Address)
 	err = ethereum.GetChainData(client, poolAddress, uniswapV3PoolAbi, "token0", token0Address)
 	if err != nil {
 		log.Fatalf("Failed to get token0 address: %v", err)
 	}
 
-	token0, err := token.NewERC20FromAddressString(client, *token0Address)
+	token0, err := token.NewERC20FromAddressString(client, token0Address.Hex())
 	if err != nil {
 		log.Fatalf("Failed to create token0: %v", err)
 	}
 
-	var token1Address *string = new(string)
-	err = ethereum.GetChainData(client, poolAddress, uniswapV3PoolAbi, "token0", token1Address)
+	token1Address := new(common.Address)
+	err = ethereum.GetChainData(client, poolAddress, uniswapV3PoolAbi, "token1", token1Address)
 	if err != nil {
 		log.Fatalf("Failed to get token0 address: %v", err)
 	}
 
-	token1, err := token.NewERC20FromAddressString(client, *token1Address)
+	token1, err := token.NewERC20FromAddressString(client, token1Address.Hex())
 	if err != nil {
 		log.Fatalf("Failed to create token0: %v", err)
 	}
@@ -65,11 +77,14 @@ func (s *SwapPrices) queryTokensAndPrice(rpcAddress string, poolAddress string, 
 		token1: token1,
 	}
 
-	var price *big.Int = new(big.Int)
-	err := ethereum.GetChainData(client, poolAddress, uniswapV3PoolAbi, "price", price)
+	slot0 := new(slot0Data)
+	err = ethereum.GetChainData(client, poolAddress, uniswapV3PoolAbi, "slot0", slot0)
 	if err != nil {
-		log.Fatalf("Failed to get token0 address: %v", err)
+		log.Fatalf("Failed to get pool slot0: %v", err)
 	}
 
-	return tokenPair, price
+	tokenPairAndPriceChannel <- TokenPairAndPrice{
+		tokenPair:    tokenPair,
+		sqrtPriceX96: (*slot0).SqrtPriceX96,
+	}
 }
