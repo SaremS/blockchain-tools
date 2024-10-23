@@ -22,4 +22,9 @@ func TestERC20Token(t *testing.T) {
 	if token.GetTokenName() != expectedName {
 		t.Fatalf("Expected token name to be %s, got %s", expectedName, token.GetTokenName())
 	}
+
+	expectedSymbol := "WPOL"
+	if token.GetSymbol() != expectedSymbol {
+		t.Fatalf("Expected token symbol to be %s, got %s", expectedSymbol, token.GetSymbol())
+	}
 }

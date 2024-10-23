@@ -13,6 +13,7 @@ var erc20Abi string
 type ERC20Token struct {
 	name     string
 	address  string
+	symbol   string
 	decimals uint8
 }
 
@@ -46,6 +47,10 @@ func (e *ERC20Token) GetTokenName() string {
 
 func (e *ERC20Token) GetAddressAsString() string {
 	return e.address
+}
+
+func (e *ERC20Token) GetSymbol() string {
+	return e.symbol
 }
 
 func (e *ERC20Token) GetDecimals() uint8 {
