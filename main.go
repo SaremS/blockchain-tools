@@ -14,13 +14,13 @@ func main() {
 	poolPriceProcessor := &dex.ConsolePoolPriceProcessor{}
 
 	currentTime := time.Now()
-	fmt.Println("\nSwap Prices at ", currentTime, ":")
+	fmt.Println("\nSwap Prices at ", currentTime.Format("2006-01-02 15:04:05"), ":")
 	swapPrices := dex.NewSwapPrices(rpcAddress, poolAddresses, poolPriceProcessor)
 
 	for {
 		time.Sleep(5 * time.Second)
 		currentTime := time.Now()
-		fmt.Println("\nSwap Prices at ", currentTime, ":")
+		fmt.Println("\nSwap Prices at ", currentTime.Format("2006-01-02 15:04:05"), ":")
 
 		swapPrices.UpdateAllPrices()
 	}
