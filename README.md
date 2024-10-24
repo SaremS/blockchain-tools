@@ -4,4 +4,4 @@
 
 Random collection of functions to interact with blockchains
 
-Currently allows to query UniswapV3Pool swap prices and postprocess the output with a custom processing logic. See `main.go`.
+Currently allows to query UniswapV3Pool swap prices and postprocess the output with a custom processing logic. See `main.go` for an example.
