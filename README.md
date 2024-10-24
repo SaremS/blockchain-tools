@@ -1,5 +1,5 @@
 # blockchain-tools
-![Go tests](https://github.com/OWNER/REPOSITORY/actions/workflows/go.yml/badge.svg)
+![Go tests](https://github.com/SaremS/blockchain-tools/actions/workflows/go.yml/badge.svg)
 
 
 Random collection of functions to interact with blockchains
