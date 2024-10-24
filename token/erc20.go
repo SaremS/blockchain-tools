@@ -17,10 +17,11 @@ type ERC20Token struct {
 	decimals uint8
 }
 
-func NewERC20Token(name string, address string, decimals uint8) *ERC20Token {
+func NewERC20Token(name, address, symbol string, decimals uint8) *ERC20Token {
 	return &ERC20Token{
 		name:     name,
 		address:  address,
+		symbol:   symbol,
 		decimals: decimals,
 	}
 }
@@ -38,7 +39,13 @@ func NewERC20FromAddressString(client *ethclient.Client, address string) (*ERC20
 		return nil, err
 	}
 
-	return NewERC20Token(*name, address, *decimals), nil
+	symbol := new(string)
+	err = ethereum.GetChainData(client, address, erc20Abi, "symbol", symbol)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewERC20Token(*name, address, *symbol, *decimals), nil
 }
 
 func (e *ERC20Token) GetTokenName() string {

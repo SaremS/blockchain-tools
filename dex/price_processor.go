@@ -13,11 +13,11 @@ type ConsolePoolPriceProcessor struct{}
 func (c *ConsolePoolPriceProcessor) ProcessTokenPairAndPrice(inputChannel chan TokenPairAndPrice, outputChannel chan<- TokenPairAndPrice) {
 	for {
 		tokenPairAndPrice := <-inputChannel
-		token0Name := tokenPairAndPrice.tokenPair.token0.GetTokenName()
-		token1Name := tokenPairAndPrice.tokenPair.token1.GetTokenName()
+		token0Symbol := tokenPairAndPrice.tokenPair.token0.GetSymbol()
+		token1Symbol := tokenPairAndPrice.tokenPair.token1.GetSymbol()
 		price := tokenPairAndPrice.price.GetAsPrice()
 
-		fmt.Printf("Token pair: %s and %s - pool price %.6f\n", token0Name, token1Name, price)
+		fmt.Printf("%s-%s: %.9f\n", token0Symbol, token1Symbol, price)
 		outputChannel <- tokenPairAndPrice
 	}
 }
